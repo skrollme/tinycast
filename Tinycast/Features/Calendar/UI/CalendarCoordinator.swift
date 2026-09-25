@@ -25,6 +25,8 @@ final class CalendarCoordinator {
     private(set) var hasMenuBarEvent = false
     /// Dismissed from the menu bar this launch, the way `autoJoined` remembers what it opened.
     private var dismissedFromMenuBar: Set<MeetingEvent.ID> = []
+    /// The meeting `.meetingDetail` shows, set just before the palette navigates there.
+    private(set) var detailMeetingID: MeetingEvent.ID?
 
     init(
         store: CalendarStore,
@@ -298,6 +300,11 @@ final class CalendarCoordinator {
 
     // MARK: - Row actions
 
+    /// Looked up by id rather than carried, so a launcher row's ⌘K menu reads the live event.
+    func meeting(id: String) -> MeetingEvent? {
+        store.event(id: id)
+    }
+
     /// ↵ on a meeting row: join it, or hand a linkless one to Calendar.
     func activateMeeting(id: String) {
         guard let meeting = store.event(id: id) else { return }
@@ -357,6 +364,12 @@ final class CalendarCoordinator {
 
     func showSchedule() {
         paletteCoordinator.togglePalette(mode: .schedule)
+    }
+
+    /// Opens the read-only detail page for one meeting, from its own action menu.
+    func showMeetingDetail(_ meeting: MeetingEvent) {
+        detailMeetingID = meeting.id
+        paletteCoordinator.navigate(to: .meetingDetail)
     }
 
     /// A miss is transient, so it reports through the HUD rather than a dialog needing dismissal.

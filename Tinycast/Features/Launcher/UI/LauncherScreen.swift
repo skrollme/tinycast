@@ -195,6 +195,13 @@ struct LauncherScreen: PaletteScreen {
         Quicklink.id(fromEntryID: entry.id).flatMap(core.quicklinks.quicklink)
     }
 
+    private func meeting(for entry: AppEntry) -> MeetingEvent? {
+        guard entry.kind == .meeting, let id = MeetingEvent.id(fromEntryID: entry.id) else {
+            return nil
+        }
+        return core.calendarCoordinator.meeting(id: id)
+    }
+
     private func entry(at selection: Int) -> AppEntry? {
         guard case .entry(let app) = row(at: selection) else { return nil }
         return app
@@ -229,6 +236,11 @@ struct LauncherScreen: PaletteScreen {
         case .meeting(let meeting):
             return MeetingActionsMenu.content(meeting: meeting, core: core)
         case .entry(let app):
+            // A searchable meeting entry is a meeting first: the same menu the card and My
+            // Schedule offer, not the generic app actions no meeting participates in anyway.
+            if let meeting = meeting(for: app) {
+                return MeetingActionsMenu.content(meeting: meeting, core: core)
+            }
             return AppActionsMenu.content(
                 app: app, searchQuery: vm.query, core: core, running: running,
                 favorites: favoriteActions(for: app, at: selection),

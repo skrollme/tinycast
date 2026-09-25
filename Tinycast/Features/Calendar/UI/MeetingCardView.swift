@@ -96,6 +96,10 @@ enum MeetingActionsMenu {
             ) {
                 core.calendarCoordinator.openInCalendar(meeting)
             })
+        items.append(
+            PopoverMenuItem(title: "Show Details", systemImage: "info.circle") {
+                core.calendarCoordinator.showMeetingDetail(meeting)
+            })
         return PopoverMenuContent(header: meeting.title, items: items)
     }
 }

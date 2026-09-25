@@ -15,6 +15,9 @@ struct MeetingEvent: Identifiable, Hashable, Sendable {
     /// EventKit's `calendarItemIdentifier` — the only handle Calendar.app's `ical://` URL accepts.
     let calendarItemID: String
     let link: MeetingLink?
+    let location: String?
+    let notes: String?
+    let attendees: [Attendee]
 
     private static let entryPrefix = "meeting:"
 
@@ -34,5 +37,22 @@ extension MeetingEvent {
         let red: Double
         let green: Double
         let blue: Double
+    }
+
+    /// One invitee's RSVP, flattened out of `EKParticipant` alongside the event that carries it.
+    struct Attendee: Identifiable, Hashable, Sendable {
+        enum Status: Sendable {
+            case accepted
+            case declined
+            case tentative
+            case pending
+            case unknown
+        }
+
+        /// The participant's own `mailto:` URL, stable across a reload unlike name alone.
+        let id: String
+        let name: String
+        let status: Status
+        let isOrganizer: Bool
     }
 }

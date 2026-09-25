@@ -174,7 +174,10 @@ final class CalendarStore {
             calendarItemID: event.calendarItemIdentifier,
             link: MeetingLink.detect(
                 fields: [event.url?.absoluteString, event.location, event.notes],
-                account: accountEmail(of: me ?? event.organizer)))
+                account: accountEmail(of: me ?? event.organizer)),
+            location: event.location,
+            notes: event.notes,
+            attendees: attendees(of: event))
     }
 
     private static func color(of calendar: EKCalendar) -> MeetingEvent.CalendarColor? {
@@ -185,6 +188,30 @@ final class CalendarStore {
         else { return nil }
         return MeetingEvent.CalendarColor(
             red: components[0], green: components[1], blue: components[2])
+    }
+
+    private static func attendees(of event: EKEvent) -> [MeetingEvent.Attendee] {
+        guard let participants = event.attendees else { return [] }
+        let organizerURL = event.organizer?.url
+        return participants.map { participant in
+            MeetingEvent.Attendee(
+                id: participant.url.absoluteString,
+                name: participant.name ?? MeetingLink.mailAddress(of: participant.url) ?? "Unknown",
+                status: attendeeStatus(from: participant.participantStatus),
+                isOrganizer: participant.url == organizerURL)
+        }
+    }
+
+    private static func attendeeStatus(
+        from status: EKParticipantStatus
+    ) -> MeetingEvent.Attendee.Status {
+        switch status {
+        case .accepted: return .accepted
+        case .declined: return .declined
+        case .tentative: return .tentative
+        case .pending: return .pending
+        default: return .unknown
+        }
     }
 
     /// The organizer covers an event booked with no guests and so no attendee list.

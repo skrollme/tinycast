@@ -618,7 +618,8 @@ struct CalendarTests {
             id: id, title: id, start: at(minutes),
             end: at(minutes).addingTimeInterval(TimeInterval(duration * 60)),
             isAllDay: isAllDay, isDeclined: isDeclined, calendarID: "cal", calendarName: "Work",
-            calendarColor: nil, calendarItemID: id, link: link)
+            calendarColor: nil, calendarItemID: id, link: link, location: nil, notes: nil,
+            attendees: [])
     }
 
     static func event(
@@ -629,7 +630,8 @@ struct CalendarTests {
             id: id, title: id, start: start,
             end: start.addingTimeInterval(TimeInterval(duration * 60)),
             isAllDay: false, isDeclined: false, calendarID: "cal", calendarName: "Work",
-            calendarColor: nil, calendarItemID: id, link: link)
+            calendarColor: nil, calendarItemID: id, link: link, location: nil, notes: nil,
+            attendees: [])
     }
 
     static func expect(_ condition: Bool, _ label: String) {

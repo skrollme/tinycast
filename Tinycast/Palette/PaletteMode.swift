@@ -14,6 +14,8 @@ enum PaletteMode: String, CaseIterable, Identifiable {
     /// Choosing a room's windows and apps; the room was named on the Rooms screen.
     case roomWindows
     case schedule
+    /// One meeting's read-only detail page, opened from its own action menu.
+    case meetingDetail
     case uninstall
     case quicklinks
     case snippets
@@ -37,6 +39,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .rooms: return "door.left.hand.open"
         case .roomWindows: return "macwindow.badge.plus"
         case .schedule: return "calendar"
+        case .meetingDetail: return "calendar"
         case .uninstall: return "trash"
         case .quicklinks: return Quicklink.sfSymbol
         case .snippets: return "curlybraces"
@@ -58,6 +61,7 @@ enum PaletteMode: String, CaseIterable, Identifiable {
         case .rooms: return "Search rooms, or name a new one…"
         case .roomWindows: return "Search windows, or type an app to add…"
         case .schedule: return "Search your schedule…"
+        case .meetingDetail: return "Meeting details"
         case .uninstall: return "Filter files and folders by name…"
         case .quicklinks: return "Search quicklinks…"
         case .snippets: return "Search snippets…"

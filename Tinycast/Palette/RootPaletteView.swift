@@ -88,6 +88,8 @@ struct RootPaletteView: View {
             return ScheduleScreen(
                 store: calendarStore, clock: meetingClock, core: core, vm: vm,
                 openActions: openActions)
+        case .meetingDetail:
+            return MeetingDetailScreen(store: calendarStore, core: core, vm: vm)
         case .clipboard:
             return ClipboardScreen(
                 store: store, core: core, vm: vm, openActions: openActions,

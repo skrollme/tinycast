@@ -150,9 +150,18 @@ the option to hide a current event immediately or after a chosen delay.
 | Create Event | Prompts for a title, a start and a duration, and writes the event. | yes |
 | Copy Meeting Link | The same meeting's link, to the pasteboard. | no |
 | Open in Calendar | Hands the meeting to Calendar.app. | no |
+| Show Details | Opens `.meetingDetail`, that meeting's read-only page. | no |
 
-**A command that opens a surface is bindable**; the two that act on the next meeting are reached
-through the join card's own ⌘K menu instead, where the meeting they act on is on screen.
+**A command that opens a surface is bindable**; the ones that act on a specific meeting are reached
+through that meeting's own ⌘K menu instead, where the meeting they act on is on screen.
+
+`MeetingActionsMenu` is the one place that builds this menu, so the card, the schedule row and the
+detail page's own footer can never disagree on what a meeting offers. `Show Details` pushes
+`.meetingDetail` (`MeetingDetailScreen`), which reads the target meeting off
+`CalendarCoordinator.detailMeetingID` — set just before the navigate, the way `RoomSession` stashes
+which room `.roomWindows` is picking for. The screen re-resolves the meeting from the store by id on
+every render rather than carrying a snapshot, so an edit or cancellation while the page is open is
+never shown stale.
 
 A miss reports through the HUD (`Nothing to join right now`), not a dialog: it is transient and there
 is nothing to acknowledge.
@@ -174,6 +183,12 @@ calendars.
 `MeetingEvent.id` is the event identifier plus the occurrence's start, because a recurring series
 shares one identifier across every instance. `calendarItemID` is kept separately: it is the only
 handle `ical://ekevent/…` accepts, and a recurring occurrence opens its series.
+
+`MeetingEvent.attendees` flattens `EKEvent.attendees` into `MeetingEvent.Attendee` — a name, an RSVP
+`Status`, and whether the invitee is the organizer — read once at fetch time like every other field,
+never touched again after that flatten. `location` and `notes` carry `EKEvent`'s own text verbatim;
+`MeetingLink.detect` still scans both for a join link, so `.meetingDetail` showing the raw text and
+the card finding a link in it are two reads of the same fields, not two sources of truth.
 
 A cancelled event never reaches a surface. A declined one is dropped by `agenda`, and an all-day or
 already-finished one with it.

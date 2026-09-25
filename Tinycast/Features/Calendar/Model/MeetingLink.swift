@@ -33,8 +33,14 @@ struct MeetingLink: Hashable, Sendable {
 
     /// EventKit's `mailto:` participant URLs are opaque: `path` sees nothing, only the string does.
     static func accountAddress(of participantURL: URL, isCurrentUser: Bool) -> String? {
+        guard isCurrentUser else { return nil }
+        return mailAddress(of: participantURL)
+    }
+
+    /// Any participant's address, with no `isCurrentUser` gate — for listing attendees.
+    static func mailAddress(of participantURL: URL) -> String? {
         let string = participantURL.absoluteString
-        guard isCurrentUser, string.lowercased().hasPrefix("mailto:") else { return nil }
+        guard string.lowercased().hasPrefix("mailto:") else { return nil }
         let raw = string.dropFirst("mailto:".count)
         let address = raw.removingPercentEncoding ?? String(raw)
         guard address.contains("@") else { return nil }
